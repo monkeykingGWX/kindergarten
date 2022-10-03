@@ -39,17 +39,22 @@
       <!-- 公告 -->
       <div class="board">
         <panel title="公告" :to="{name: 'news', params: {active: 0}}"></panel>
-        <div class="content">
-          <div class="title">人民币汇率双破7 个人如何应对？</div>
-          <div class="desc van-multi-ellipsis--l3">时隔两年多，人民币对美元汇率再度贬破“7”关口。9月16日，在岸人民币对美元汇率跌破“7”。昨日，离岸人民币对美元汇率已先破“7”。从8月15日大幅走低到今日破“7”，离岸人民币对美元汇率下跌了3.88%，人民币对美元即期汇率下跌超3.9%。</div>
+        <div class="content" @click="go({name: 'newsDetail', params:{id: topNews.newsId}})">
+          <div class="title">{{topNews.title}}</div>
+          <div class="desc van-multi-ellipsis--l3">{{topNews.msg}}</div>
         </div>
       </div>
 
       <!-- 儿童教育 -->
       <div class="news-list">
-        <panel title="儿童教育" :to="{name: 'news', params: {active: 2}}"></panel>
+        <panel title="儿童教育" :to="{name: 'news', params: {active: 1}}"></panel>
         <div class="news-content">
-          <news-item v-for="item of [1,2,3,4,5,6,7]" :key="item"></news-item>
+          <news-item v-for="item of newsList"
+            :key="item.newsId"
+            :newsId="item.newsId"
+            :cover="item.newsCover"
+            :desc="item.msg"
+            ></news-item>
         </div>
       </div>
     </van-pull-refresh>
@@ -57,13 +62,16 @@
 </template>
 
 <script>
+import { getCovers } from '@/api/others.js'
+import { getTopNews, getNewsList } from '@/api/news'
+import { imageShow } from '@/utils/filters.js'
+import myMixin from '@/mixin/myMixin'
 import panel from '@/components/Panel.vue'
 import newsItem from '@/components/NewsItem.vue'
-import { getCovers } from '@/api/others.js'
-import { imageShow } from '@/utils/filters.js'
 
 export default {
   name: 'index',
+  mixins: [myMixin],
   components: {
     panel,
     'news-item': newsItem
@@ -71,11 +79,15 @@ export default {
   data () {
     return {
       isLoading: false,
-      banners: []
+      banners: [],
+      topNews: {},
+      newsList: []
     }
   },
   created () {
     this.getCoverList()
+    this.getTopNews()
+    this.getNewsList()
   },
   methods: {
     banner (index) {
@@ -86,14 +98,27 @@ export default {
         location.href = target.link
       }
     },
-    onRefresh () {
-      setTimeout(() => {
-        this.isLoading = false
-      }, 1000)
+    async onRefresh () {
+      await this.getCoverList()
+      await this.getTopNews()
+      this.isLoading = false
     },
     async getCoverList () {
       const response = await getCovers()
       this.banners = response.data
+    },
+    async getTopNews () {
+      const response = await getTopNews()
+      this.topNews = response.data
+    },
+    async getNewsList () {
+      const response = await getNewsList({
+        pageSize: 8,
+        pageNum: 1,
+        cateId: 3
+      })
+
+      this.newsList = response.data
     }
   },
   filters: {

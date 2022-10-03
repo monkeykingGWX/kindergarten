@@ -6,12 +6,12 @@
           <news-item v-for="item of list[0]" :key="item" />
         </div>
       </van-tab>
-      <van-tab title="活动">
+      <van-tab title="儿童教育">
         <div class="news">
           <news-item v-for="item of list[1]" :key="item" />
         </div>
       </van-tab>
-      <van-tab title="儿童教育">
+      <van-tab title="活动">
         <div class="news">
           <news-item v-for="item of list[2]" :key="item" />
         </div>

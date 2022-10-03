@@ -1,12 +1,13 @@
 <template>
   <div>
     <div class="news-item">
-      <router-link :to="{name:'newsDetail'}">
-        <img src="@/assets/image/ch1.jpg" />
+      <router-link :to="{name:'newsDetail', params: {id: newsId}}">
+        <img :src="cover | imageShow" />
         <div class="item-right">
-          <div class="title">典型儿童语言障碍案例分析指导</div>
+          <div class="title">{{title}}</div>
           <div class="desc van-multi-ellipsis--l2">
-            寓教于乐，多予鼓励：充分利用生活中的素材，让被测试者充分接近生活，在玩中学，在生活过程中得到训练，减少直接的学习和训练给学生带来的疲劳和厌倦。</div>
+            {{desc}}
+          </div>
         </div>
       </router-link>
     </div>
@@ -14,15 +15,29 @@
 </template>
 
 <script>
+import { imageShow } from '@/utils/filters.js'
 export default {
   name: 'news-item',
   props: {
-    to: {
-      type: Object,
-      default () {
-        return {}
-      }
+    newsId: {
+      type: Number,
+      required: true
+    },
+    cover: {
+      type: String,
+      required: true
+    },
+    title: {
+      type: String,
+      required: true
+    },
+    desc: {
+      type: String,
+      required: true
     }
+  },
+  filters: {
+    imageShow
   }
 }
 </script>
