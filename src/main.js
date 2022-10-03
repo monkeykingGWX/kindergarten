@@ -4,10 +4,11 @@ import router from './router'
 import store from './store'
 
 // 导入vant
-import Vant from 'vant'
+import Vant, { Lazyload } from 'vant'
 import 'vant/lib/index.less'
 
 Vue.use(Vant)
+Vue.use(Lazyload)
 Vue.config.productionTip = false
 
 new Vue({

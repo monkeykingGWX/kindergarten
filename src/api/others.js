@@ -9,3 +9,14 @@ export function getCovers () {
     }
   })
 }
+
+export function getTeachers (params) {
+  return request({
+    url: '/teacher',
+    method: 'get',
+    params,
+    headers: {
+      needToken: false
+    }
+  })
+}

@@ -53,6 +53,7 @@
             :key="item.newsId"
             :newsId="item.newsId"
             :cover="item.newsCover"
+            :title="item.title"
             :desc="item.msg"
             ></news-item>
         </div>

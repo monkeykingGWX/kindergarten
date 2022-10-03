@@ -6,16 +6,23 @@
       fixed
       placeholder
       @click-left="onClickLeft"
-    />
+    ></van-nav-bar>
 
     <!-- 教师团队 -->
     <div class="teacher">
-      <teacher-item v-for="item of [1,2,3,4,5,6,7,8,9]" :key="item"></teacher-item>
+      <van-list
+        v-model="loading"
+        :finished="finished"
+        finished-text="没有更多了"
+        @load="onLoad">
+        <teacher-item v-for="item of list" :key="item.teacherId"></teacher-item>
+      </van-list>
     </div>
   </div>
 </template>
 
 <script>
+import { getTeachers } from '@/api/others'
 import teachItem from '@/components/TeacherItem.vue'
 
 export default {
@@ -23,9 +30,45 @@ export default {
   components: {
     'teacher-item': teachItem
   },
+  data () {
+    return {
+      params: {
+        pageSize: 6,
+        pageNum: 1
+      },
+      list: [],
+      loading: false,
+      finished: false
+    }
+  },
+  created () {
+    this.getTeachers()
+  },
   methods: {
     onClickLeft () {
       this.$router.go(-1)
+    },
+    onLoad () {
+      console.log(1111)
+      // 异步更新数据
+      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
+      setTimeout(() => {
+        for (let i = 0; i < 10; i++) {
+          this.list.push(this.list.length + 1)
+        }
+
+        // 加载状态结束
+        this.loading = false
+
+        // 数据全部加载完成
+        if (this.list.length >= 40) {
+          this.finished = true
+        }
+      }, 1000)
+    },
+    async getTeachers () {
+      const { data } = await getTeachers(this.params)
+      this.list = data
     }
   }
 }

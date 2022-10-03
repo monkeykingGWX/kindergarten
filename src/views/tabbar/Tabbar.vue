@@ -1,6 +1,8 @@
 <template>
   <div>
-    <router-view/>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
 
     <van-tabbar route fixed placeholder>
       <van-tabbar-item replace :to="{name: 'index'}" icon="home-o">首页</van-tabbar-item>
