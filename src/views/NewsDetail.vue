@@ -7,108 +7,50 @@
       placeholder
       @click-left="onClickLeft"
     />
-    <div class="news-detail">
-      <article>
-        <h1>这几件国礼，意涵丰富，大有讲究</h1>
+    <div class="news-detail" v-if="newsDetail">
+      <article ref="article">
+        <h1>{{newsDetail.title}}</h1>
         <div class="pubdate">
-          <div>文章所属：儿童教育</div>
-          <div>发布于 <span>12/12 12:12</span></div>
+          <div>文章所属：{{newsDetail.cateName}}</div>
+          <div>发布于 <span>{{newsDetail.createTime | dateFormat}}</span></div>
         </div>
-        <div class="content">
-          <p>
-            新华社努尔苏丹9月16日电
-            国际交往，讲究礼尚往来。国礼既是人民友谊的使者，也是国家间友好关系的见证。此次访问哈萨克斯坦，习近平主席给托卡耶夫总统带来了几件国礼，每一件都意涵丰富，大有讲究。
-          </p>
-          <p>
-            一是名为《中哈友好》的景泰蓝内画尊。这件礼品以中国传统礼器“尊”为器型，融合了中国非物质文化遗产景泰蓝工艺和内画工艺。内画部分是四幅精挑细选的图案：古丝绸之路、中哈油气管道项目、中哈霍尔果斯国际边境合作中心、过境哈萨克斯坦的中欧班列。
-          </p>
-          <p>
-            <img
-              src="https://gwx-my-course.oss-cn-hangzhou.aliyuncs.com/20220917/4c0d006d73f94dc98dd95ae22e7f5cc3.jpeg"
-            />
-          </p>
-          <p>
-            习近平主席曾说：“哈萨克斯坦这片土地，是古丝绸之路经过的地方，曾经为沟通东西方文明，促进不同民族、不同文化相互交流和合作作出过重要贡献。”2013年，正是在哈萨克斯坦，习近平主席首次提出共建“丝绸之路经济带”倡议。这件景泰蓝内画尊融通古今，既展示了中哈交往的悠久历史，也呈现出中哈共建“一带一路”的丰硕成果，更寄托着中哈永久全面战略伙伴关系行稳致远的美好祈愿。
-          </p>
-          <p>
-            二是湘绣单面绣《长城》。湘绣是中国四大名绣之一，长城是中华文化的符号之一，象征意志和勇气、团结和力量。这幅湘绣，借长城的寓意，祝愿哈萨克斯坦人民团结一心建设“新哈萨克斯坦”取得成功。
-          </p>
-          <p>
-            三是一套文房用品，毛笔精工细作，徽墨色泽黑润，端砚坚实细腻，铜质文房用品温润敦厚。讲清楚这份国礼的“门道”，首先要介绍托卡耶夫总统的另一个“身份”：“博学的汉学家”。
-          </p>
-          <p>
-            20世纪八九十年代，托卡耶夫在北京深造学习，后来担任驻华外交官。在哈萨克斯坦外交家博拉特·努尔加利耶夫看来，托卡耶夫总统熟知中国历史、文化和现实国情，这将帮助他同习近平主席展开“高度信任和内容丰富的对话”，在更广泛的意义上，还有助于“深化和扩大哈中互利合作”。
-          </p>
-          <p>
-            当然，习近平主席向托卡耶夫总统赠送文房用品不仅因为他熟知中国文化，更要借此表达中国人民对哈萨克斯坦人民书写国家发展新篇章的美好祝愿。
-          </p>
-        </div>
+        <div class="content"  v-html="newsDetail.newsContent"></div>
       </article>
 
       <div class="comments">
-        <div class="comment-send">
+        <div v-if="isLogin" class="comment-send">
+          <div class="comments-submit">
+            <img :src="userInfo.face | imageShow" class="user-face" />
+            <textarea v-model.trim="comment" placeholder="说说你的看法"></textarea>
+          </div>
+          <button type="button" class="send-btn" @click="sendComment">发表</button>
+        </div>
+        <div v-else class="comment-send">
           <div class="comments-submit">
             <img src="@/assets/image/default-face.png" class="user-face" />
-            <textarea placeholder="说说你的看法"></textarea>
+            <textarea placeholder="说说你的看法" @click="go({name:'login'})"></textarea>
           </div>
           <button type="button" class="send-btn">发表</button>
         </div>
         <div class="comments-list">
-          <div class="comments-item">
-            <div class="comments-top">
-              <img
-                src="https://gwx-my-course.oss-cn-hangzhou.aliyuncs.com/20220815/0c21eb5483af43a7a28b42a449e76cda.jpeg"
-              />
-              <span class="nickname">Jay</span> <span class="date">刚刚</span>
+          <van-list
+          v-model="loading"
+          :finished="finished"
+          finished-text="没有更多了"
+          :immediate-check="false"
+          @load="nextPage">
+            <div v-for="item of list" :key="item.commentId" class="comments-item">
+              <div class="comments-top">
+                <img
+                  :src="item.face | imageShow"
+                />
+                <span class="nickname">{{item.babyName}}</span> <span class="date">{{item.createTime | dateFormat}}</span>
+              </div>
+              <div class="comment-content">
+                {{item.msg}}
+              </div>
             </div>
-            <div class="comment-content">
-              太阳像个老大老大的火球，光线灼人，公路被烈日烤得发烫，脚踏下去一步一串白烟。天气闷热得要命，一丝风也没有，稠乎乎的空气好像凝住了。整个城市像烧透了的砖窑，使人喘不过气来。狗趴在地上吐出鲜红的舌头，骡马的鼻孔张得特别大。
-            </div>
-          </div>
-          <div class="comments-item">
-            <div class="comments-top">
-              <img
-                src="https://gwx-my-course.oss-cn-hangzhou.aliyuncs.com/20220815/0c21eb5483af43a7a28b42a449e76cda.jpeg"
-              />
-              <span class="nickname">Jay</span> <span class="date">刚刚</span>
-            </div>
-            <div class="comment-content">
-              太阳像个老大老大的火球，光线灼人，公路被烈日烤得发烫，脚踏下去一步一串白烟。天气闷热得要命，一丝风也没有，稠乎乎的空气好像凝住了。整个城市像烧透了的砖窑，使人喘不过气来。狗趴在地上吐出鲜红的舌头，骡马的鼻孔张得特别大。
-            </div>
-          </div>
-          <div class="comments-item">
-            <div class="comments-top">
-              <img
-                src="https://gwx-my-course.oss-cn-hangzhou.aliyuncs.com/20220815/0c21eb5483af43a7a28b42a449e76cda.jpeg"
-              />
-              <span class="nickname">Jay</span> <span class="date">刚刚</span>
-            </div>
-            <div class="comment-content">
-              太阳像个老大老大的火球，光线灼人，公路被烈日烤得发烫，脚踏下去一步一串白烟。天气闷热得要命，一丝风也没有，稠乎乎的空气好像凝住了。整个城市像烧透了的砖窑，使人喘不过气来。狗趴在地上吐出鲜红的舌头，骡马的鼻孔张得特别大。
-            </div>
-          </div>
-          <div class="comments-item">
-            <div class="comments-top">
-              <img
-                src="https://gwx-my-course.oss-cn-hangzhou.aliyuncs.com/20220815/0c21eb5483af43a7a28b42a449e76cda.jpeg"
-              />
-              <span class="nickname">Jay</span> <span class="date">刚刚</span>
-            </div>
-            <div class="comment-content">
-              太阳像个老大老大的火球，光线灼人，公路被烈日烤得发烫，脚踏下去一步一串白烟。天气闷热得要命，一丝风也没有，稠乎乎的空气好像凝住了。整个城市像烧透了的砖窑，使人喘不过气来。狗趴在地上吐出鲜红的舌头，骡马的鼻孔张得特别大。
-            </div>
-          </div>
-          <div class="comments-item">
-            <div class="comments-top">
-              <img
-                src="https://gwx-my-course.oss-cn-hangzhou.aliyuncs.com/20220815/0c21eb5483af43a7a28b42a449e76cda.jpeg"
-              />
-              <span class="nickname">Jay</span> <span class="date">刚刚</span>
-            </div>
-            <div class="comment-content">
-              太阳像个老大老大的火球，光线灼人，公路被烈日烤得发烫，脚踏下去一步一串白烟。天气闷热得要命，一丝风也没有，稠乎乎的空气好像凝住了。整个城市像烧透了的砖窑，使人喘不过气来。狗趴在地上吐出鲜红的舌头，骡马的鼻孔张得特别大。
-            </div>
-          </div>
+          </van-list>
         </div>
       </div>
     </div>
@@ -116,12 +58,125 @@
 </template>
 
 <script>
+import { getUserInfo, userSendComment } from '@/api/user'
+import { getNewsDetail } from '@/api/news'
+import { getCommentOfNews } from '@/api/others'
+import { dateFormat, imageShow } from '@/utils/filters'
+import myMixin from '@/mixin/myMixin'
+
 export default {
   name: 'news-detail',
+  mixins: [myMixin],
+  props: {
+    id: {
+      required: true
+    }
+  },
+  data () {
+    return {
+      newsDetail: null,
+      isLogin: false,
+      userInfo: null,
+      comment: '', // 评论内容
+      params: {
+        pageNum: 1,
+        pageSize: 6
+      },
+      loading: false,
+      finished: false,
+      list: []
+    }
+  },
+  activated () {
+    // 获取vuex中的jwtToken
+    const jwtToken = this.$store.state.jwtToken
+    // 判断是否已过期
+    const expire = jwtToken.expire
+    if (expire > Date.now()) {
+      // 获取用户信息
+      this.getUserInfo()
+    }
+    this.params = {
+      pageNum: 1,
+      pageSize: 6
+    }
+    this.list = []
+    this.getNewsDetail(this.id)
+    this.getCommentOfNews(this.id)
+  },
   methods: {
     onClickLeft () {
       this.$router.go(-1)
+    },
+    async getNewsDetail (id) {
+      const { data } = await getNewsDetail(id)
+      this.newsDetail = data
+      this.$nextTick(() => { // TODO 该代码容易造成死循环
+        const imgList = this.$refs.article.querySelectorAll('img')
+        for (const img of imgList) {
+          img.onerror = function () {
+            const src = this.src
+
+            if (src.includes(':8888')) {
+              this.src = src.replace(':8888', ':8080')
+            }
+          }
+        }
+      })
+    },
+    async getCommentOfNews (id, reflash = false) {
+      this.loading = true
+
+      if (reflash) {
+        this.params.pageNum = 1
+      }
+
+      const { data } = await getCommentOfNews(id, this.params)
+
+      if (reflash) {
+        this.list = data
+      } else {
+        this.list.push(...data)
+      }
+
+      if (data.length < this.params.pageSize) {
+        this.finished = true
+      } else {
+        this.params.pageNum++
+      }
+
+      this.loading = false
+    },
+    async getUserInfo () {
+      const { data } = await getUserInfo()
+      if (data) {
+        this.isLogin = true
+        this.userInfo = data
+      }
+    },
+    async sendComment () {
+      if (!this.comment) {
+        this.$toast.fail({
+          message: '请填写评论内容',
+          overlay: true
+        })
+      } else {
+        await userSendComment({ msg: this.comment, newsId: this.id })
+        this.comment = ''
+        this.getCommentOfNews(this.id, true)
+
+        this.$toast.success({
+          message: '发布成功'
+        })
+      }
+    },
+    nextPage () {
+      this.getCommentOfNews(this.id)
     }
+  },
+  filters: {
+    dateFormat,
+    imageShow
   }
 }
 </script>
@@ -143,11 +198,11 @@ article {
     font-size: (22 / @rootSize);
     margin-bottom: (10 / @rootSize);
   }
-  img {
+  /deep/ img {
     display: block;
     max-width: 100%;
   }
-  p {
+  /deep/ p {
     margin: (8 / @rootSize) 0;
     line-height: 1.5;
   }

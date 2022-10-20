@@ -5,27 +5,71 @@
     </div>
     <div class="form" >
       <div class="item">
-        <van-icon name="user-o" color="#fff" /> <input type="text" autocomplete="off" placeholder="请输入用户名" />
+        <van-icon name="user-o" color="#fff" /> <input type="text" v-model.trim="loginName" autocomplete="off" placeholder="请输入用户名" />
       </div>
       <div class="item">
-        <i class="iconfont" style="color:#fff">&#xe669;</i> <input type="password" autocomplete="off" placeholder="请输入密码" />
+        <i class="iconfont" style="color:#fff">&#xe669;</i> <input type="password"  v-model.trim="loginPass" autocomplete="off" placeholder="请输入密码" />
       </div>
       <div class="item">
-        <i class="iconfont" style="color:#fff">&#xe669;</i> <input type="password" autocomplete="off" placeholder="再次输入密码" />
+        <i class="iconfont" style="color:#fff">&#xe669;</i> <input type="password"  v-model.trim="repeatPass" autocomplete="off" placeholder="再次输入密码" />
       </div>
       <div class="jump">
-        <router-link class="a" :to="{name:'login'}">已有账号，去登录</router-link>
+        <div class="a" @click="replaceGo({name:'login'})" >已有账号，去登录</div>
       </div>
     </div>
     <div class="button">
-      <van-button type="default" round block >注&nbsp;&nbsp;册</van-button>
+      <van-button type="default" round block @click="reg">注&nbsp;&nbsp;册</van-button>
     </div>
   </div>
 </template>
 
 <script>
+import myMixin from '@/mixin/myMixin'
+import { userReg } from '@/api/user'
+
 export default {
-  name: 'reg'
+  name: 'reg',
+  mixins: [myMixin],
+  data () {
+    return {
+      loginName: null,
+      loginPass: null,
+      repeatPass: null
+    }
+  },
+  methods: {
+    beforeSub () {
+      if (!this.loginName) {
+        this.$dialog.alert({ message: '请填写登录账号' })
+        return false
+      }
+
+      if (!this.loginPass) {
+        this.$dialog.alert({ message: '请填写登陆密码' })
+        return false
+      }
+
+      if (this.loginPass !== this.repeatPass) {
+        this.$dialog.alert({ message: '两次密码输入不一致' })
+        return false
+      }
+
+      return true
+    },
+    async reg () {
+      if (this.beforeSub()) {
+        await userReg({
+          loginName: this.loginName,
+          loginPass: this.loginPass
+        })
+
+        this.$toast.success('注册成功，跳转登陆页……')
+        setTimeout(() => {
+          this.replaceGo({ name: 'login' })
+        }, 2000)
+      }
+    }
+  }
 }
 </script>
 

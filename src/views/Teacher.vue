@@ -14,8 +14,16 @@
         v-model="loading"
         :finished="finished"
         finished-text="没有更多了"
+        :immediate-check="false"
         @load="onLoad">
-        <teacher-item v-for="item of list" :key="item.teacherId"></teacher-item>
+        <teacher-item v-for="item of list"
+          :key="item.teacherId"
+          :face="item.face"
+          :name="item.name"
+          :title="item.position"
+          :intro="item.introduce"
+          >
+        </teacher-item>
       </van-list>
     </div>
   </div>
@@ -33,13 +41,17 @@ export default {
   data () {
     return {
       params: {
-        pageSize: 6,
+        pageSize: 8,
         pageNum: 1
       },
       list: [],
       loading: false,
       finished: false
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    from.meta.top = window.scrollY
+    next()
   },
   created () {
     this.getTeachers()
@@ -49,26 +61,20 @@ export default {
       this.$router.go(-1)
     },
     onLoad () {
-      console.log(1111)
-      // 异步更新数据
-      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        for (let i = 0; i < 10; i++) {
-          this.list.push(this.list.length + 1)
-        }
-
-        // 加载状态结束
-        this.loading = false
-
-        // 数据全部加载完成
-        if (this.list.length >= 40) {
-          this.finished = true
-        }
-      }, 1000)
+      this.getTeachers()
     },
     async getTeachers () {
+      this.loading = true
       const { data } = await getTeachers(this.params)
-      this.list = data
+      this.list.push(...data)
+
+      if (data.length < this.params.pageSize) {
+        this.finished = true
+      } else {
+        this.params.pageNum++
+      }
+
+      this.loading = false
     }
   }
 }

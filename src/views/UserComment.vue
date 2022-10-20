@@ -8,34 +8,62 @@
       @click-left="onClickLeft"
     />
     <div class="list">
-      <div class="item">
-        <router-link to="">
-          <p class="msg">这是我第一次评论，有点紧张，不要见外。下次我一定更加努力，谢谢大家！</p>
-          <p class="pubdate">2020/01/02 12:14</p>
-        </router-link>
-      </div>
-      <div class="item">
-        <router-link to="">
-          <p class="msg">这是我第一次评论，有点紧张，不要见外。下次我一定更加努力，谢谢大家！</p>
-          <p class="pubdate">2020/01/02 12:14</p>
-        </router-link>
-      </div>
-      <div class="item">
-        <router-link to="">
-          <p class="msg">这是我第一次评论，有点紧张，不要见外。下次我一定更加努力，谢谢大家！</p>
-          <p class="pubdate">2020/01/02 12:14</p>
-        </router-link>
-      </div>
+        <van-list
+          v-model="loading"
+          :finished="finished"
+          finished-text="没有更多了"
+          :immediate-check="false"
+          @load="getUserComments">
+          <div v-for="item of list" :key="item.commentId" class="item">
+            <router-link :to="{name: 'newsDetail', params: {id: item.newsId}}">
+              <p class="msg">{{item.msg}}</p>
+              <p class="pubdate">{{item.createTime}}</p>
+            </router-link>
+          </div>
+        </van-list>
     </div>
   </div>
 </template>
 
 <script>
+import { userComment } from '@/api/user'
+
 export default {
   name: 'user-comment',
+  data () {
+    return {
+      loading: false,
+      finished: false,
+      params: {
+        pageNum: 1,
+        pageSize: 10
+      },
+      list: []
+    }
+  },
+  created () {
+    this.getUserComments()
+  },
+  beforeRouteLeave (to, from, next) {
+    from.meta.top = window.scrollY
+    next()
+  },
   methods: {
     onClickLeft () {
       this.$router.go(-1)
+    },
+    async getUserComments () {
+      this.loading = true
+      const { data } = await userComment(this.params)
+      this.list.push(...data)
+
+      if (data.length < this.params.pageSize) {
+        this.finished = true
+      } else {
+        this.params.pageNum++
+      }
+
+      this.loading = false
     }
   }
 }

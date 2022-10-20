@@ -20,3 +20,13 @@ export function getNewsList (params) {
     }
   })
 }
+
+export function getNewsDetail (id) {
+  return request({
+    url: `/news/${id}`,
+    method: 'get',
+    headers: {
+      needToken: false
+    }
+  })
+}

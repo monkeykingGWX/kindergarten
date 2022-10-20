@@ -9,71 +9,37 @@
     />
 
     <div class="recipe">
-      <div class="recipe-item">
-        <div class="title">周一食谱</div>
-        <div class="food">
-          <p><b>早餐</b></p>
-          <p>牛奶 鸡蛋 面包</p>
-          <p><b>中餐</b></p>
-          <p>米饭 红烧肉 红烧带鱼 蒸蛋 西红柿汤</p>
-          <p><b>下午</b></p>
-          <p>饼干 奶茶</p>
-        </div>
-      </div>
-      <div class="recipe-item">
-        <div class="title">周二食谱</div>
-        <div class="food">
-          <p><b>早餐</b></p>
-          <p>牛奶 鸡蛋 面包</p>
-          <p><b>中餐</b></p>
-          <p>米饭 红烧肉 红烧带鱼 蒸蛋 西红柿汤</p>
-          <p><b>下午</b></p>
-          <p>饼干 奶茶</p>
-        </div>
-      </div>
-      <div class="recipe-item">
-        <div class="title">周三食谱</div>
-        <div class="food">
-          <p><b>早餐</b></p>
-          <p>牛奶 鸡蛋 面包</p>
-          <p><b>中餐</b></p>
-          <p>米饭 红烧肉 红烧带鱼 蒸蛋 西红柿汤</p>
-          <p><b>下午</b></p>
-          <p>饼干 奶茶</p>
-        </div>
-      </div>
-      <div class="recipe-item">
-        <div class="title">周四食谱</div>
-        <div class="food">
-          <p><b>早餐</b></p>
-          <p>牛奶 鸡蛋 面包</p>
-          <p><b>中餐</b></p>
-          <p>米饭 红烧肉 红烧带鱼 蒸蛋 西红柿汤</p>
-          <p><b>下午</b></p>
-          <p>饼干 奶茶</p>
-        </div>
-      </div>
-      <div class="recipe-item">
-        <div class="title">周五食谱</div>
-        <div class="food">
-          <p><b>早餐</b></p>
-          <p>牛奶 鸡蛋 面包</p>
-          <p><b>中餐</b></p>
-          <p>米饭 红烧肉 红烧带鱼 蒸蛋 西红柿汤</p>
-          <p><b>下午</b></p>
-          <p>饼干 奶茶</p>
-        </div>
+      <div v-for="item of list" :key="item.dietId" class="recipe-item" >
+        <div class="title">{{item.title}}</div>
+        <div class="food" v-html="item.dietContent"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { getDiets } from '@/api/others'
 export default {
   name: 'recipe',
+  data () {
+    return {
+      list: []
+    }
+  },
+  created () {
+    this.getDiets()
+  },
+  beforeRouteLeave (to, from, next) {
+    from.meta.top = window.scrollY
+    next()
+  },
   methods: {
     onClickLeft () {
       this.$router.go(-1)
+    },
+    async getDiets () {
+      const { data } = await getDiets()
+      this.list = data
     }
   }
 }
@@ -98,7 +64,7 @@ export default {
 
     .food {
       padding: (15/@rootSize);
-      p{
+      /deep/ p{
         margin: (8/@rootSize) 0;
         line-height: 1.6;
       }

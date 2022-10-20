@@ -1,28 +1,50 @@
 <template>
   <div>
     <div class="teacher-item" @click="showDesc">
-        <img src="@/assets/image/ch8.jpg" />
+        <img :src="face|imageShow" />
         <div class="teacher-item-right">
-          <div class="title">刘老师 <span>园长</span></div>
-          <div class="desc van-multi-ellipsis--l3">从事幼儿教育36年，先后在西安交通大学医学院第一附属医院幼儿园、西安海伦国际幼儿园、品格教育集团任教。拥有26年幼儿园园长管理经验，在教育教学管理工作中，探求教学创新技能，致力于教育管理理念的更新，被授予西安市“优秀教师”、雁塔区“管理育人标兵”等荣誉称号。</div>
+          <div class="title">{{name}} <span>{{title}}</span></div>
+          <div class="desc van-multi-ellipsis--l3">{{intro}}</div>
         </div>
     </div>
   </div>
 </template>
 
 <script>
+import { imageShow } from '@/utils/filters.js'
 import { Dialog } from 'vant'
 
 export default {
   name: 'teacher-item',
+  props: {
+    face: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    title: {
+      type: String,
+      default: ''
+    },
+    intro: {
+      type: String,
+      require: true
+    }
+  },
   methods: {
     showDesc () {
       Dialog({
         showConfirmButton: false,
         closeOnClickOverlay: true,
-        message: '从事幼儿教育36年，先后在西安交通大学医学院第一附属医院幼儿园、西安海伦国际幼儿园、品格教育集团任教。拥有26年幼儿园园长管理经验，在教育教学管理工作中，探求教学创新技能，致力于教育管理理念的更新，被授予西安市“优秀教师”、雁塔区“管理育人标兵”等荣誉称号。'
+        message: this.intro
       })
     }
+  },
+  filters: {
+    imageShow
   }
 }
 </script>

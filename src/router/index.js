@@ -29,9 +29,9 @@ const routes = [
     component: tabbar,
     children: [
       {
-        path: '', component: index, name: 'index'
+        path: '', component: index, name: 'index', meta: { isRecord: true, top: 0 }
       }, {
-        path: '/news', component: news, name: 'news', props: true
+        path: '/news', component: news, name: 'news', props: true, meta: { isRecord: true, top: 0 }
       }, {
         path: '/user', component: user, name: 'user'
       }
@@ -39,27 +39,34 @@ const routes = [
   }, {
     path: '/teacher',
     component: teacher,
-    name: 'teacher'
+    name: 'teacher',
+    meta: { isRecord: true, top: 0 }
   }, {
     path: '/course',
     component: course,
-    name: 'course'
+    name: 'course',
+    meta: { isRecord: true, top: 0 }
   }, {
     path: '/recipe',
     component: recipe,
-    name: 'recipe'
+    name: 'recipe',
+    meta: { isRecord: true, top: 0 }
   }, {
     path: '/brief',
     component: brief,
-    name: 'brief'
+    name: 'brief',
+    meta: { isRecord: true, top: 0 }
   }, {
-    path: '/news-detail',
+    path: '/news-detail/:id',
     component: NewsDetail,
-    name: 'newsDetail'
+    name: 'newsDetail',
+    props: true,
+    meta: { isRecord: true, top: 0 }
   }, {
     path: '/user-comment',
     component: UserComment,
-    name: 'userComment'
+    name: 'userComment',
+    meta: { isRecord: true, top: 0 }
   }, {
     path: '/user-info',
     component: UserInfo,
@@ -73,6 +80,14 @@ const routes = [
 
 const router = new VueRouter({
   routes
+})
+
+router.afterEach((to, from) => {
+  if (to.meta.isRecord) {
+    setTimeout(() => {
+      window.scrollTo(0, to.meta.top)
+    }, 0)
+  }
 })
 
 export default router

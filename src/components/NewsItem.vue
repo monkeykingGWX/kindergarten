@@ -2,7 +2,7 @@
   <div>
     <div class="news-item">
       <router-link :to="{name:'newsDetail', params: {id: newsId}}">
-        <img :src="cover | imageShow" />
+        <van-image :src="cover | imageShow" fit="cover" />
         <div class="item-right">
           <div class="title">{{title}}</div>
           <div class="desc van-multi-ellipsis--l2">
@@ -52,8 +52,8 @@ export default {
   a {
     display: flex;
 
-    img {
-      width: (60/@rootSize);
+    /deep/ img {
+      width: (60/@rootSize) ;
       height: (60/@rootSize);
       margin-right: (8/@rootSize);
     }

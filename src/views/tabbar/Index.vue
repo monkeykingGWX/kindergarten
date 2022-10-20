@@ -85,6 +85,10 @@ export default {
       newsList: []
     }
   },
+  beforeRouteLeave (to, from, next) {
+    from.meta.top = window.scrollY
+    next()
+  },
   created () {
     this.getCoverList()
     this.getTopNews()
@@ -94,7 +98,7 @@ export default {
     banner (index) {
       const target = this.banners[index]
       if (target.type === 1) {
-        this.$router.push({ name: 'newsDetail', params: { newsId: target.link } })
+        this.$router.push({ name: 'newsDetail', params: { id: target.link } })
       } else {
         location.href = target.link
       }

@@ -1,19 +1,9 @@
 <template>
   <div>
-    <van-tabs v-model="tabIndex" sticky>
-      <van-tab title="公告">
+    <van-tabs v-model="tabIndex" sticky :before-change="beforeTabsChange" @change="onTabsChange">
+      <van-tab v-for="item of cates" :key="item.cateId" :title="item.cateName">
         <div class="news">
-          <news-item v-for="item of list[0]" :key="item" />
-        </div>
-      </van-tab>
-      <van-tab title="儿童教育">
-        <div class="news">
-          <news-item v-for="item of list[1]" :key="item" />
-        </div>
-      </van-tab>
-      <van-tab title="活动">
-        <div class="news">
-          <news-item v-for="item of list[2]" :key="item" />
+          <news-list :cateId="item.cateId"></news-list>
         </div>
       </van-tab>
     </van-tabs>
@@ -21,24 +11,55 @@
 </template>
 
 <script>
-import NewsItemVue from '@/components/NewsItem.vue'
+import { getAllNewsCate } from '@/api/newsCate'
+import NewsList from '@/components/NewsList.vue'
+
+const nameToTop = {}
+
 export default {
   name: 'news',
   components: {
-    'news-item': NewsItemVue
+    'news-list': NewsList
   },
   data () {
     return {
       tabIndex: 0,
-      list: [
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3]
-      ]
+      cates: []
     }
   },
-  created () {
+  beforeRouteLeave (to, from, next) {
+    from.meta.top = window.scrollY
+    next()
+  },
+  async created () {
     this.tabIndex = this.$route.params.active
+    await this.getAllNewsCate()
+  },
+  methods: {
+    async getAllNewsCate () {
+      const { data } = await getAllNewsCate()
+      this.cates = data
+    },
+    // tabs 发生切换之前，触发此方法
+    beforeTabsChange () {
+      nameToTop[this.tabIndex] = window.scrollY
+
+      // return true 表示允许进行标签页的切换
+      return true
+    },
+    onTabsChange () {
+      this.$nextTick(() => {
+        const y = nameToTop[this.tabIndex]
+        window.scrollTo(0, y || 0)
+      })
+    }
+  },
+  watch: {
+    $route: function (to, from) {
+      if (this.$route.params.active) {
+        this.tabIndex = this.$route.params.active
+      }
+    }
   }
 }
 </script>
